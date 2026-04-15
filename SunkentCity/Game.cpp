@@ -6,6 +6,15 @@
 Game::Game(sf::RenderWindow& win) 
     : window(win), score(0.f), gameTimer(60.f), isGameOver(false), gameSpeed(250.f) 
 {
+    if (!gameMusic.openFromFile("assets/saturn-3-music-underwater-whale-and-diving-sound-ambient-116185.mp3")) {
+        std::cerr << "Erreur : Impossible de charger la musique !" << std::endl;
+    } else {
+        gameMusic.setLoop(true);  // La musique recommence à la fin
+        gameMusic.setVolume(50); // Volume entre 0 et 100
+        gameMusic.play();        // Lancer la musique
+    }
+    // Arrête la musique au crash
+
     // 1. Chargement du fond
     if (!backgroundTex.loadFromFile("assets/water2.jpg")) {
         std::cerr << "Erreur : Impossible de charger assets/water2.jpg" << std::endl;
@@ -100,7 +109,10 @@ void Game::update(float dt) {
                 isGameOver = true;
             }
         }
-
+if (player->getHitbox().intersects(obstacles[i]->getHitbox())) {
+    isGameOver = true;
+    gameMusic.stop(); // Arrête la musique au crash
+}
         if (obstacles[i]->getPosition().x < -100) {
             delete obstacles[i];
             obstacles.erase(obstacles.begin() + i);
@@ -116,6 +128,26 @@ void Game::render() {
         obs->draw(window);
     }
     player->draw(window);
+   // sf::RectangleShape pDebug;
+   /*sf::FloatRect pHit = player->getHitbox(); 
+    pDebug.setPosition(pHit.left, pHit.top);
+    pDebug.setSize({pHit.width, pHit.height});
+    pDebug.setFillColor(sf::Color::Transparent);
+    pDebug.setOutlineColor(sf::Color::Red);
+    pDebug.setOutlineThickness(2);
+    window.draw(pDebug);
+    for (auto obs : obstacles) {
+        sf::RectangleShape oDebug;
+        sf::FloatRect oHit = obs->getHitbox();
+        oDebug.setPosition(oHit.left, oHit.top);
+        oDebug.setSize({oHit.width, oHit.height});
+        oDebug.setFillColor(sf::Color::Transparent);
+        oDebug.setOutlineColor(sf::Color::Yellow);
+        oDebug.setOutlineThickness(2);
+        window.draw(oDebug);
+    }
+        */
+
 
     std::stringstream ss;
     ss << "Bunker dans : " << (int)gameTimer << "s\n"

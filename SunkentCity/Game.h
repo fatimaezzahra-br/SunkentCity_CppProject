@@ -5,11 +5,13 @@
 #include <vector>
 #include "Player.h"
 #include "Obstacle.h"
+#include <SFML/Audio.hpp>
 
 class Game {
 private:
     // --- RÉFÉRENCES ET SYSTÈME ---
-    sf::RenderWindow& window;  // Référence à la fenêtre créée dans le main
+    sf::RenderWindow& window;
+    sf::Music gameMusic;  // Référence à la fenêtre créée dans le main
     sf::Font font;             // Police pour le score et les messages
     sf::Text uiText;    
     sf::Texture backgroundTex;  // La texture reste en mémoire ici

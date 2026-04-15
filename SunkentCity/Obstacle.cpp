@@ -14,8 +14,8 @@ Obstacle::Obstacle(float x, float y) {
 
     // Optionnel : On peut ajuster la taille si l'image est trop grande
     // sprite.setScale(0.5f, 0.5f);
-    float targetWidth = 60.0f; 
-    float targetHeight = 60.0f;
+    float targetWidth = 50.0f; 
+    float targetHeight = 50.0f;
     sprite.setScale(
         targetWidth / sprite.getLocalBounds().width, 
         targetHeight / sprite.getLocalBounds().height
@@ -24,6 +24,9 @@ Obstacle::Obstacle(float x, float y) {
 
 void Obstacle::update(float dt, float gameSpeed) {
     // 4. Gestion des obstacles (Apparition aléatoire)
+    // Dans Player.cpp et Obstacle.cpp (Constructeur)
+sf::FloatRect bounds = sprite.getLocalBounds();
+sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
 
     // L'obstacle se déplace vers la gauche
     // gameSpeed est la vitesse de défilement du monde
@@ -42,3 +45,4 @@ sf::FloatRect Obstacle::getBounds() const {
 sf::Vector2f Obstacle::getPosition() const {
     return sprite.getPosition();
 }
+// Dans Player.cpp et Obstacle.cpp (Constructeur)
