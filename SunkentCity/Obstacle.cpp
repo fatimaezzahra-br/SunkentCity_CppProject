@@ -1,24 +1,44 @@
 #include "Obstacle.h"
+#include <iostream>
 
-Obstacle::Obstacle() {
-    shape.setSize({60.f, 60.f});      // Un peu plus grand
-    shape.setFillColor(sf::Color::Red);
-    // On le met à 1200 au lieu de 800 pour qu'il soit déjà visible à l'écran
-    shape.setPosition(800.f, 400.f); 
+// Le constructeur prend x et y pour savoir où faire apparaître l'obstacle
+Obstacle::Obstacle(float x, float y) {
+    // 1. Chargement de la texture (Idéalement via AssetManager, sinon en direct ici)
+    if (!texture.loadFromFile("assets/fish1.jpg")) {
+        // Si l'image n'est pas trouvée, on peut utiliser un rectangle de couleur
+        std::cerr << "Erreur : Texture obstacle manquante !" << std::endl;
+    }
+    
+    sprite.setTexture(texture);
+    sprite.setPosition(x, y);
+
+    // Optionnel : On peut ajuster la taille si l'image est trop grande
+    // sprite.setScale(0.5f, 0.5f);
+    float targetWidth = 60.0f; 
+    float targetHeight = 60.0f;
+    sprite.setScale(
+        targetWidth / sprite.getLocalBounds().width, 
+        targetHeight / sprite.getLocalBounds().height
+    ); 
 }
 
-void Obstacle::update()
-{
-    // Réduis la vitesse à -2.f pour bien voir s'il bouge au début
-    shape.move(-2.f, 0.f);
+void Obstacle::update(float dt, float gameSpeed) {
+    // 4. Gestion des obstacles (Apparition aléatoire)
+
+    // L'obstacle se déplace vers la gauche
+    // gameSpeed est la vitesse de défilement du monde
+    sprite.move(-gameSpeed * dt, 0.f);
 }
 
-void Obstacle::draw(sf::RenderWindow& window)
-{
-    window.draw(shape);
+void Obstacle::draw(sf::RenderWindow& window) {
+    window.draw(sprite);
 }
 
-sf::FloatRect Obstacle::getBounds()
-{
-    return shape.getGlobalBounds();
+sf::FloatRect Obstacle::getBounds() const {
+    // Retourne la zone de collision de l'obstacle
+    return sprite.getGlobalBounds();
+}
+
+sf::Vector2f Obstacle::getPosition() const {
+    return sprite.getPosition();
 }

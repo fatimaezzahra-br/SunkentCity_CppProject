@@ -1,42 +1,53 @@
 #ifndef GAME_H
 #define GAME_H
-#include <vector>
-#include "Obstacle.h"
+
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include "AssetManager.h"
+#include <vector>
 #include "Player.h"
+#include "Obstacle.h"
 
 class Game {
-public:
-   Game(sf::RenderWindow& existingWindow);
-    ~Game();
-    void run();
-
 private:
-bool isGameOver; // Ajoute ceci
-    sf::Text gameOverText;
-int score; // <--- AJOUTE CECI
-    sf::Text scoreText;
-    void update();
-    void render();
+    // --- RÉFÉRENCES ET SYSTÈME ---
+    sf::RenderWindow& window;  // Référence à la fenêtre créée dans le main
+    sf::Font font;             // Police pour le score et les messages
+    sf::Text uiText;    
+    sf::Texture backgroundTex;  // La texture reste en mémoire ici
+    sf::Sprite backgroundSprite;       // Objet texte pour l'affichage écran
+    
+    // --- OBJETS DU JEU ---
+    Player* player;                // Pointeur vers le joueur
+    std::vector<Obstacle*> obstacles; // Liste dynamique d'obstacles
 
-   sf::RenderWindow& window;
-    AssetManager assets;
-    Player* player;
-    sf::Music music;
-    sf::Clock clock;
-    float timeLeft;
+    // --- VARIABLES DE JEU (LOGIQUE) ---
+    float score;         // Score actuel (basé sur le temps)
+    float gameTimer;     // Compte à rebours avant le bunker (ex: 60s)
+    float gameSpeed;     // Vitesse de défilement des obstacles
+    bool isGameOver;     // État du jeu (Mort ou Victoire)
 
-    // Objets pour le Menu et le Jeu
-    sf::Texture menuTex;
-    sf::Sprite menuSprite;
-    sf::Texture backTex;
-    sf::Sprite backSprite;
+    // --- MÉTHODES PRIVÉES ---
+    void initUI();       // Initialisation des textes
+    void update(float dt); // Logique interne
+    void render();       // Affichage interne
 
-    bool isMenu; // Variable cruciale pour basculer entre menu et jeu
-    std::vector<Obstacle*> obstacles;
-sf::Clock obstacleClock;
+public:
+    /**
+     * @brief Constructeur
+     * @param win Référence vers la fenêtre de rendu du main.cpp
+     */
+    Game(sf::RenderWindow& win);
+
+    /**
+     * @brief Destructeur
+     * Libère la mémoire (Player et Obstacles)
+     */
+    ~Game();
+
+    /**
+     * @brief Boucle principale du jeu
+     * Gère le DeltaTime, les événements et l'appel à update/render
+     */
+    void run();
 };
 
-#endif
+#endif // GAME_H

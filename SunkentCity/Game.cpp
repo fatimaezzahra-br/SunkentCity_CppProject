@@ -1,173 +1,141 @@
 #include "Game.h"
 #include <iostream>
-#include "Obstacle.h"
+#include <sstream>
 
-Game::Game(sf::RenderWindow& existingWindow) : window(existingWindow)
+// Constructeur
+Game::Game(sf::RenderWindow& win) 
+    : window(win), score(0.f), gameTimer(60.f), isGameOver(false), gameSpeed(250.f) 
 {
-    isGameOver = false;
-    isMenu = true;
-    score = 0;
-    timeLeft = 60.f;
-
-    window.setFramerateLimit(60);
-
-    // Charger assets
-    assets.load();
-
-    // Texte Game Over
-    gameOverText.setFont(assets.getFont("arial"));
-    gameOverText.setString("GAME OVER\nAppuyez sur Entree pour quitter");
-    gameOverText.setCharacterSize(50);
-    gameOverText.setFillColor(sf::Color::Red);
-    gameOverText.setPosition(150, 250);
-
-    // Score
-    scoreText.setFont(assets.getFont("arial"));
-    scoreText.setCharacterSize(30);
-    scoreText.setFillColor(sf::Color::Yellow);
-    scoreText.setPosition(20, 20);
-
-    // Backgrounds
-    if (!menuTex.loadFromFile("assets/water2.jpg"))
-        std::cerr << "Erreur chargement menu" << std::endl;
-    menuSprite.setTexture(menuTex);
-
-    if (!backTex.loadFromFile("assets/fish2.jpg"))
-        std::cerr << "Erreur chargement background" << std::endl;
-    backSprite.setTexture(backTex);
-
-    // Player
-    player = new Player(assets.getTexture("player"));
-
-    // Musique
-    if (music.openFromFile("assets/dragon-studio-underwater-ambience-376890.mp3"))
-    {
-        music.setLoop(true);
-        music.play();
+    // 1. Chargement du fond
+    if (!backgroundTex.loadFromFile("assets/water2.jpg")) {
+        std::cerr << "Erreur : Impossible de charger assets/water2.jpg" << std::endl;
+    } else {
+        backgroundTex.setSmooth(true);
+        backgroundSprite.setTexture(backgroundTex);
+        
+        sf::Vector2u size = backgroundTex.getSize();
+        backgroundSprite.setScale(800.f / size.x, 600.f / size.y);
     }
+
+    // 2. Initialisation des entités
+  obstacles.clear();
+    player = new Player();
+    
+    // POSITION DE SECURITE : On force le joueur a gauche (x=50) au milieu (y=300)
+    // pour qu'il ne touche aucun obstacle qui apparaitrait par erreur
+    player->setPosition(50.f, 300.f); 
+
+    // 3. Interface UI
+    if (!font.loadFromFile("assets/Fonts/arial.ttf")) {
+        std::cerr << "Erreur : Police arial.ttf introuvable !" << std::endl;
+    }
+
+    uiText.setFont(font);
+    uiText.setCharacterSize(24);
+    uiText.setFillColor(sf::Color::White);
+    uiText.setPosition(20, 20);
 }
 
-void Game::run()
+Game::~Game() {
+    delete player;
+    for (auto obs : obstacles) {
+        delete obs;
+    }
+    obstacles.clear();
+}
 
-{
-   
-    while (window.isOpen())
-    {
-        update();
+void Game::run() {
+    sf::Clock clock;
+    while (window.isOpen()) {
+        sf::Event e;
+        while (window.pollEvent(e)) {
+            if (e.type == sf::Event::Closed) {
+                window.close();
+                return;
+            }
+            if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Escape) {
+                return;
+            }
+        }
+
+        float dt = clock.restart().asSeconds();
+
+        if (!isGameOver) {
+            update(dt);
+        } else {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+                return;
+            }
+        }
         render();
     }
 }
 
-void Game::update()
-{
-    sf::Event e;
-    while (window.pollEvent(e))
-    {
-        if (e.type == sf::Event::Closed)
-            window.close();
+void Game::update(float dt) {
+    gameTimer -= dt;
+    score += dt * 10.f;
+    gameSpeed += dt * 2.f;
 
-        if (isMenu && e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Enter)
-        {
-            isMenu = false;
-            clock.restart();
-            obstacleClock.restart();
+    if (gameTimer <= 0) {
+        gameTimer = 0;
+        isGameOver = true;
+    }
+
+    player->update(dt);
+
+    // --- CORRECTION APPARITION ---
+    if (rand() % 100 < 2) { 
+        float spawnX = 1000.f; // On le cree tres loin a droite (hors ecran)
+        float randomY = static_cast<float>(rand() % 500 + 50);
+        obstacles.push_back(new Obstacle(spawnX, randomY)); // On utilise bien spawnX
+    }
+
+    // --- CORRECTION COLLISIONS ---
+    for (int i = obstacles.size() - 1; i >= 0; i--) {
+        obstacles[i]->update(dt, gameSpeed);
+
+        // On ne teste la collision que si l'obstacle est entre dans l'ecran (x < 800)
+        if (obstacles[i]->getPosition().x < 800) { 
+            if (player->getBounds().intersects(obstacles[i]->getBounds())) {
+                isGameOver = true;
+            }
         }
 
-        if (isGameOver && e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Enter)
-        {
-            window.close();
-        }
-    }
-
-    if (isMenu || isGameOver)
-    {
-        clock.restart();
-        return;
-    }
-
-    float dt = clock.restart().asSeconds();
-
-    player->update();
-
-    // Spawn obstacles
-    if (obstacleClock.getElapsedTime().asSeconds() > 2.0f)
-    {
-        obstacles.push_back(new Obstacle());
-        obstacleClock.restart();
-    }
-
-    // Update obstacles
-    for (size_t i = 0; i < obstacles.size();)
-    {
-        obstacles[i]->update();
-
-       /* if (player->getBounds().intersects(obstacles[i]->getBounds()))
-        {
-            isGameOver = true;
-        }*/
-
-        if (obstacles[i]->getBounds().left < -100)
-        {
+        if (obstacles[i]->getPosition().x < -100) {
             delete obstacles[i];
             obstacles.erase(obstacles.begin() + i);
         }
-        else
-        {
-            i++;
-        }
     }
-
-    // Time
-    timeLeft -= dt;
-    if (timeLeft <= 0)
-        isGameOver = true;
-
-    // Score
-    static float timer = 0;
-    timer += dt;
-
-    if (timer >= 1.0f)
-    {
-        score += 10;
-        timer = 0;
-    }
-
-    scoreText.setString("Score: " + std::to_string(score));
 }
 
-void Game::render()
-{
+void Game::render() {
     window.clear();
+    window.draw(backgroundSprite);
 
-    if (isMenu)
-    {
-        window.draw(menuSprite);
+    for (auto obs : obstacles) {
+        obs->draw(window);
     }
-    else
-    {
-        window.draw(backSprite);
+    player->draw(window);
 
-        for (auto obs : obstacles)
-            obs->draw(window);
+    std::stringstream ss;
+    ss << "Bunker dans : " << (int)gameTimer << "s\n"
+       << "Score : " << (int)score;
+    uiText.setString(ss.str());
+    window.draw(uiText);
 
-        if (player)
-            player->draw(window);
-
-        window.draw(scoreText);
-
-        if (isGameOver)
-            window.draw(gameOverText);
+    if (isGameOver) {
+        sf::Text endMsg;
+        endMsg.setFont(font);
+        endMsg.setCharacterSize(40);
+        endMsg.setFillColor(sf::Color::Yellow);
+        
+        if (gameTimer <= 0) 
+            endMsg.setString("VICTOIRE ! MARRAKECH SAUVEE\nAppuyez sur Entree");
+        else 
+            endMsg.setString("GAME OVER !\nAppuyez sur Entree");
+        
+        endMsg.setPosition(150, 250);
+        window.draw(endMsg);
     }
-
     window.display();
-}
-
-Game::~Game()
-{
-    delete player;
-
-    for (auto obs : obstacles)
-        delete obs;
-
-    obstacles.clear();
 }

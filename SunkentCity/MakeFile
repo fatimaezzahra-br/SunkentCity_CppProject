@@ -1,24 +1,16 @@
-# Chemins
-SFML_INCLUDE := ../src/include
-SFML_LIB     := ../src/lib
+# Chemins (Vérifie bien que le dossier SFML est ici)
+SFML_I := "C:\Users\fatima ezzahra\Desktop\SFML-2.6.2-windows-gcc-13.1.0-mingw-64-bit\SFML-2.6.2\src\include"
+SFML_L := "C:\Users\fatima ezzahra\Desktop\SFML-2.6.2-windows-gcc-13.1.0-mingw-64-bit\SFML-2.6.2\src\lib"
 
-# Compilateur et options
-CXX := g++
-CXXFLAGS := -std=c++17 -I$(SFML_INCLUDE)
-# AJOUT DE -lsfml-audio ICI
-LDFLAGS := -L$(SFML_LIB) -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
+# Options
+CXX      := g++
+CXXFLAGS := -std=c++17 -I$(SFML_I)
+LDFLAGS  := -L$(SFML_L) -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
 
-# Liste des fichiers (AJOUT DE Player.o ICI)
-OBJ = main.o Game.o AssetManager.o Menu.o Obstacle.o Player.o
-TARGET = SunkentCity.exe
+# Cible principale
+all:
+	$(CXX) *.cpp -o jeu.exe $(CXXFLAGS) $(LDFLAGS)
 
-$(TARGET): $(OBJ)
-	$(CXX) $(OBJ) -o $(TARGET) $(LDFLAGS)
-
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
+# Nettoyage
 clean:
-	del *.o $(TARGET)
-	clean:
-	del /f *.o SunkentCity.exe
+	del /f *.exe

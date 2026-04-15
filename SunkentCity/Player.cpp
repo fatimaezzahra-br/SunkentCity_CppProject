@@ -1,42 +1,32 @@
-// Player.cpp
 #include "Player.h"
-#include "Constants.h"
 
-Player::Player(sf::Texture& texture)
-{
+Player::Player() : speed(300.f) {
+    texture.loadFromFile("assets/diver.png");
     sprite.setTexture(texture);
-    sprite.setPosition({100, 400});
-    sprite.setColor(sf::Color::White);
-    velocity = {0, 0};
-    onGround = false;
+    sprite.setPosition(100.f, 300.f);
 }
 
-void Player::update()
-{
-    velocity.y += GRAVITY;
-    sprite.move(velocity);
+void Player::update(float dt) {
+    sf::Vector2f pos = sprite.getPosition();
+    float boundsW = sprite.getGlobalBounds().width;
+    float boundsH = sprite.getGlobalBounds().height;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))    sprite.move(0, -speed * dt);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))  sprite.move(0, speed * dt);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))  sprite.move(-speed * dt, 0);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) sprite.move(speed * dt, 0);
+    sf::Vector2f newPos = sprite.getPosition();
 
-    if (sprite.getPosition().y > 400) {
-        sprite.setPosition(sprite.getPosition().x, 400);
-        velocity.y = 0;
-        onGround = true;
-    }
+    // Bloquer à gauche et à droite (0 à 800)
+    if (newPos.x < 0) newPos.x = 0;
+    if (newPos.x + boundsW > 800) newPos.x = 800 - boundsW;
+
+    // Bloquer en haut et en bas (0 à 600)
+    if (newPos.y < 0) newPos.y = 0;
+    if (newPos.y + boundsH > 600) newPos.y = 600 - boundsH;
+
+    sprite.setPosition(newPos);
 }
 
-void Player::jump()
-{
-    if (onGround) {
-        velocity.y = JUMP_FORCE;
-        onGround = false;
-    }
-}
 
-void Player::draw(sf::RenderWindow& window)
-{
-    window.draw(sprite);
-}
-
-sf::FloatRect Player::getBounds()
-{
-    return sprite.getGlobalBounds();
-}
+void Player::draw(sf::RenderWindow& window) { window.draw(sprite); }
+sf::FloatRect Player::getBounds() const { return sprite.getGlobalBounds(); }

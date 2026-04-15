@@ -1,27 +1,29 @@
 // AssetManager.cpp
 #include "AssetManager.h"
+#include <iostream>
 
-sf::Texture& AssetManager::getTexture(const std::string& name)
-{
-    return textures[name];
+void AssetManager::loadTexture(std::string name, std::string fileName) {
+    sf::Texture tex;
+    if (tex.loadFromFile(fileName)) {
+        textures[name] = tex;
+    } else {
+        std::cerr << "Erreur : Impossible de charger la texture " << fileName << std::endl;
+    }
 }
 
-sf::SoundBuffer& AssetManager::getSound(const std::string& name)
-{
-    return sounds[name];
+sf::Texture& AssetManager::getTexture(std::string name) {
+    return textures.at(name);
 }
 
-void AssetManager::load()
-{
-    textures["player"].loadFromFile("assets/person2.jpg");
-    textures["key"].loadFromFile("assets/key.jpg");
-    textures["bg"].loadFromFile("assets/background.jpg");
-
-    sounds["jump"].loadFromFile("assets/freesound_community-underwater-waves-5983.mp3");
-    sounds["hit"].loadFromFile("assets/freesound_community-underwater-waves-5983.mp3");
-    fonts["arial"].loadFromFile("assets/Fonts/arial.ttf"); 
+void AssetManager::loadFont(std::string name, std::string fileName) {
+    sf::Font font;
+    if (font.loadFromFile(fileName)) {
+        fonts[name] = font;
+    } else {
+        std::cerr << "Erreur : Impossible de charger la police " << fileName << std::endl;
+    }
 }
-sf::Font& AssetManager::getFont(const std::string& name)
-{
-    return fonts[name];
+
+sf::Font& AssetManager::getFont(std::string name) {
+    return fonts.at(name);
 }
