@@ -6,7 +6,9 @@
 enum class ObstacleType
 {
     DAMAGE,
-    BONUS
+    BONUS,
+    SPEED,
+    SCORE
 };
 
 class Obstacle
@@ -16,8 +18,8 @@ private:
     sf::Texture texture;
     ObstacleType type;
 
-public:
-    Obstacle(float x, float y);
+public:  // ✅ constructeur corrigé
+    Obstacle(float x, float y, ObstacleType t);
 
     void update(float dt, float gameSpeed);
     void draw(sf::RenderWindow& window);
@@ -28,5 +30,6 @@ public:
     void setType(ObstacleType t);
     ObstacleType getType() const;
 };
+
 
 #endif
