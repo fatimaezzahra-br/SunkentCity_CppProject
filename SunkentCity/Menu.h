@@ -6,7 +6,7 @@
 
 class Menu {
 private:
-    AssetManager assets; // Le manager est membre de la classe
+    AssetManager assets; 
     sf::Sprite backgroundSprite;
     
     // On déclare les textes ici pour plus de clarté
@@ -14,9 +14,9 @@ private:
     sf::Text playText;
     sf::Text quitText;
     sf::Text aboutText;
-    bool isShowingAbout;          // Est-ce qu'on affiche l'onglet à propos ?
-    sf::RectangleShape overlay;    // Fond sombre derrière le texte
-    sf::Text aboutDescription;     // Le contenu du texte à propos
+    bool isShowingAbout;          
+    sf::RectangleShape overlay;   
+    sf::Text aboutDescription;     
     sf::Font font;
 
 public:

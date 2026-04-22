@@ -1,7 +1,7 @@
-// Constants.h
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
-
+#include <string>
 // =====================================================
 // 🪟 WINDOW SETTINGS
 // =====================================================
@@ -68,6 +68,7 @@ const int MENU_QUIT_Y = 390;
 // =====================================================
 const char PLAYER_TEXTURE[] = "assets/diver.png";
 const char OBSTACLE_TEXTURE[] = "assets/fish1.jpg";
+
 const char MENU_BACKGROUND[] = "assets/menu.png";
 const char LEVEL1_BACKGROUND[] = "assets/water2.jpg";
 const char LEVEL2_BACKGROUND[] = "assets/background nocturne.png";
@@ -79,10 +80,10 @@ const char FONT_PATH[] = "assets/Fonts/arial.ttf";
 // =====================================================
 // 🎵 MUSIC (background)
 // 🎵 MUSIC (background)
-const std::string MUSIC_PATH = "assets/music.mp3";
+const std::string MUSIC_PATH = "assets/make-a-music-game-in-sunknetcity--with-ambinece-for-kids-_042026.mp3";
 
-// 🔊 SOUND EFFECTS
-const std::string WIN_SOUND_PATH = "assets/win.wav";
-const std::string GAMEOVER_SOUND_PATH = "assets/gameover.wav";
+// 🔊 SOUND EFFECT
+const std::string WIN_SOUND_PATH = "assets/winsongs.mp3";
+const std::string GAMEOVER_SOUND_PATH = "assets/game_over.mp3";
 
 #endif

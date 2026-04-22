@@ -18,8 +18,9 @@ std::unique_ptr<Player> player;
    std::vector<std::unique_ptr<Obstacle>> obstacles;
 
     sf::Texture backgroundTex;
-    sf::Sprite backgroundSprite;
-
+   
+sf::Sprite bg1;
+sf::Sprite bg2;
     sf::Font font;
     sf::Text uiText;
 
@@ -44,9 +45,9 @@ bool gameOverSoundPlayed = false;
 
     bool isGameOver;
     bool returnToMenu;
-
+bool reachedBunker = false;
     int level;
-
+bool justChangedLevel = false;
 public:
     Game(sf::RenderWindow& win);
     ~Game();

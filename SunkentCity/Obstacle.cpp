@@ -1,5 +1,6 @@
 #include "Obstacle.h"
 #include <iostream>
+#include <cstdlib> // pour rand()
 
 // ===================== CONSTRUCTOR =====================
 Obstacle::Obstacle(float x, float y, ObstacleType t)
@@ -14,24 +15,36 @@ Obstacle::Obstacle(float x, float y, ObstacleType t)
     }
     else if (type == ObstacleType::DAMAGE)
     {
-        if (!texture.loadFromFile("assets/fish1.jpg"))
-            std::cout << "Error loading damage texture\n";}
-              else if (type == ObstacleType::DAMAGE)
-    {
-        if (!texture.loadFromFile("assets/fish2.jpg"))
-            std::cout << "Error loading damage texture\n";}
-             
+        // 🎯 2 types de DAMAGE (random)
+        int r = rand() % 2;
+
+        if (r == 0)
+        {
+            if (!texture.loadFromFile("assets/fish1.jpg"))
+                std::cout << "Error loading fish1 texture\n";
+        }
+        else
+        {
+            if (!texture.loadFromFile("assets/fish2.jpg"))
+                std::cout << "Error loading fish2 texture\n";
+        }
+    }
     else if (type == ObstacleType::SCORE)
     {
         if (!texture.loadFromFile("assets/coin.png"))
             std::cout << "Error loading coin texture\n";
     }
-    else
+    else if (type == ObstacleType::SPEED)
     {
-        if (!texture.loadFromFile("assets/fish1.png"))
-            std::cout << "Error loading default texture\n";
+        if (!texture.loadFromFile("assets/speed.png"))
+            std::cout << "Error loading speed texture\n";
     }
+  
+    
+        // fallback (sécurité)
+       
 
+    // ===================== SPRITE SETUP =====================
     sprite.setTexture(texture);
     sprite.setPosition(x, y);
 
@@ -47,6 +60,7 @@ Obstacle::Obstacle(float x, float y, ObstacleType t)
 // ===================== UPDATE =====================
 void Obstacle::update(float dt, float gameSpeed)
 {
+    // mouvement vers la gauche
     sprite.move(-gameSpeed * dt, 0.f);
 }
 
